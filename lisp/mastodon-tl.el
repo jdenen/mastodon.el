@@ -101,6 +101,11 @@ keep the timestamps current as time progresses."
     (mastodon-tl--init
      (concat "tag-" tag) (concat "timelines/tag/" tag) 'mastodon-tl--timeline)))
 
+(defun mastodon-tl--get-favorites-timeline ()
+  "Opens 'timeline' of favorites."
+  (interactive)
+  (mastodon-tl--get-favorites))
+
 (defun mastodon-tl--goto-toot-pos (find-pos refresh &optional pos)
   "Search for toot with FIND-POS.
 If search returns nil, execute REFRESH function.
@@ -592,6 +597,16 @@ UPDATE-FUNCTION is used to recieve more toots."
                                                                (current-buffer)
                                                                nil))))
     buffer))
+
+(defun mastodon-tl--get-favorites ()
+  "Display favorites in buffer."
+  (let* ((url (mastodon-http--api "favourites"))
+	 (buffer "*mastodon-favorites*")
+	 (json (mastodon-http--get-json url)))
+    (with-output-to-temp-buffer buffer
+      (switch-to-buffer buffer)
+      (mastodon-tl--timeline json))
+    (mastodon-mode)))
 
 (provide 'mastodon-tl)
 ;;; mastodon-tl.el ends here
